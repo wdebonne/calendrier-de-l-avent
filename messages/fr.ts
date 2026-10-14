@@ -415,6 +415,9 @@ const fr = {
       testFail: "Échec de l'envoi : {error}",
       testSubject: "Test SMTP réussi 🎄",
       testBody: "Bravo ! La configuration SMTP de {app} fonctionne.",
+      hostRequired: "Renseignez le serveur SMTP (ex. smtp.gmail.com, smtp-mail.outlook.com, ssl0.ovh.net).",
+      fromRequired: "Renseignez l'email de l'expéditeur.",
+      testToRequired: "Indiquez une adresse pour recevoir le test.",
     },
     auth: {
       forgotEnabled: "Autoriser la réinitialisation par email",

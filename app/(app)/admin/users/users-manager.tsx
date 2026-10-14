@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { KeyRound, Pencil, Search, Trash2, UserPlus } from "lucide-react";
 import { Alert, Badge, Button, Card, Field, Input, Select, Toggle, buttonClass } from "@/components/ui";
 import { Modal } from "@/components/calendar/modal";
 import { createUserAction, deleteUserAction, sendResetLinkAction, updateUserAction, type AdminState } from "../actions";
+import { useFormAction } from "@/components/use-form-action";
 
 interface UserRow {
   id: string;
@@ -59,7 +60,7 @@ function UserForm({ user, onDone }: { user?: UserRow; onDone: () => void }) {
   const ta = useTranslations("auth");
   const tc = useTranslations("common");
   const action = user ? updateUserAction.bind(null, user.id) : createUserAction;
-  const [state, formAction, pending] = useActionState(action, undefined);
+  const [state, formAction, pending] = useFormAction(action, undefined);
   const [invite, setInvite] = useState(!user);
 
   useEffect(() => {
@@ -70,7 +71,7 @@ function UserForm({ user, onDone }: { user?: UserRow; onDone: () => void }) {
   }, [state, onDone]);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form onSubmit={formAction} className="space-y-4">
       <h3 className="text-lg font-bold">{user ? user.name : t("newUser")}</h3>
       <Field label={ta("name")}>
         <Input name="name" defaultValue={user?.name} required maxLength={100} />

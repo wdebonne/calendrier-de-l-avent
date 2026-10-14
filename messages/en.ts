@@ -416,6 +416,9 @@ const en: Messages = {
       testFail: "Sending failed: {error}",
       testSubject: "SMTP test successful 🎄",
       testBody: "Great! The SMTP configuration of {app} works.",
+      hostRequired: "Enter the SMTP server (e.g. smtp.gmail.com, smtp-mail.outlook.com, ssl0.ovh.net).",
+      fromRequired: "Enter the sender email.",
+      testToRequired: "Enter an address to receive the test.",
     },
     auth: {
       forgotEnabled: "Allow password reset by email",

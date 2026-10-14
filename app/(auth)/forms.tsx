@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Alert, Button, Field, Input } from "@/components/ui";
 import { forgotAction, loginAction, resetAction, setupAction, type FormState } from "./actions";
+import { useFormAction } from "@/components/use-form-action";
 
 function Status({ state }: { state: FormState }) {
   if (!state) return null;
@@ -15,9 +15,9 @@ function Status({ state }: { state: FormState }) {
 
 export function LoginForm({ next }: { next?: string }) {
   const t = useTranslations("auth");
-  const [state, action, pending] = useActionState(loginAction, undefined);
+  const [state, action, pending] = useFormAction(loginAction, undefined);
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       <input type="hidden" name="next" value={next ?? ""} />
       <Field label={t("email")} htmlFor="email">
         <Input id="email" name="email" type="email" autoComplete="email" required autoFocus />
@@ -45,9 +45,9 @@ export function LoginForm({ next }: { next?: string }) {
 
 export function SetupForm() {
   const t = useTranslations("auth");
-  const [state, action, pending] = useActionState(setupAction, undefined);
+  const [state, action, pending] = useFormAction(setupAction, undefined);
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       <Field label={t("name")} htmlFor="name">
         <Input id="name" name="name" required autoFocus />
       </Field>
@@ -67,9 +67,9 @@ export function SetupForm() {
 
 export function ForgotForm() {
   const t = useTranslations("auth");
-  const [state, action, pending] = useActionState(forgotAction, undefined);
+  const [state, action, pending] = useFormAction(forgotAction, undefined);
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       <Field label={t("email")} htmlFor="email">
         <Input id="email" name="email" type="email" autoComplete="email" required autoFocus />
       </Field>
@@ -84,7 +84,7 @@ export function ForgotForm() {
 
 export function ResetForm({ token }: { token: string }) {
   const t = useTranslations("auth");
-  const [state, action, pending] = useActionState(resetAction, undefined);
+  const [state, action, pending] = useFormAction(resetAction, undefined);
   if (state?.success) {
     return (
       <div className="space-y-4">
@@ -94,7 +94,7 @@ export function ResetForm({ token }: { token: string }) {
     );
   }
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       <input type="hidden" name="token" value={token} />
       <Field label={t("newPassword")} htmlFor="password">
         <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required autoFocus />

@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { RefreshCw } from "lucide-react";
 import { Alert, Button, Card, Field, Input, Select, Textarea, Toggle } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { newSlugAction, type ActionState } from "./actions";
+import { useFormAction } from "@/components/use-form-action";
 
 export interface SettingsValues {
   title: string;
@@ -32,7 +33,7 @@ export function CalendarSettingsForm({
 }) {
   const t = useTranslations("calendar");
   const tc = useTranslations("common");
-  const [state, formAction, pending] = useActionState(action, undefined);
+  const [state, formAction, pending] = useFormAction(action, undefined);
   const [slug, setSlug] = useState(values.slug);
   const [unlock, setUnlock] = useState(values.unlock_mode);
   const [removePwd, setRemovePwd] = useState(false);
@@ -43,7 +44,7 @@ export function CalendarSettingsForm({
   const err = (field: string) => (state?.field === field ? state.error : undefined);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form onSubmit={formAction} className="space-y-6">
       <Card className="space-y-5 p-5 sm:p-6">
         <Field label={t("title")} htmlFor="title" error={err("title")}>
           <Input id="title" name="title" defaultValue={values.title} placeholder={t("titlePlaceholder")} required maxLength={120} />

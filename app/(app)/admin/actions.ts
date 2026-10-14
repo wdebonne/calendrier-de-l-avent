@@ -193,6 +193,7 @@ function smtpFromForm(form: FormData, current: SmtpSettings): SmtpSettings {
 export async function saveSmtpAction(_: AdminState, form: FormData): Promise<AdminState> {
   await requireAdmin();
   await setSetting("smtp", smtpFromForm(form, await getSetting("smtp")));
+  revalidatePath("/admin/settings", "layout");
   return { success: (await getTranslations("common"))("saved") };
 }
 
@@ -202,6 +203,10 @@ export async function testSmtpAction(form: FormData): Promise<AdminState> {
   const t = await getTranslations("admin.smtp");
   const smtp = smtpFromForm(form, await getSetting("smtp"));
   const to = str(form, "testTo", 200);
+  // Without a host, nodemailer silently falls back to localhost:587.
+  if (!smtp.host) return { error: t("hostRequired") };
+  if (!smtp.fromEmail) return { error: t("fromRequired") };
+  if (!to) return { error: t("testToRequired") };
   const general = await getSetting("general");
   try {
     await verifySmtp(smtp);
@@ -224,6 +229,7 @@ export async function saveAuthAction(_: AdminState, form: FormData): Promise<Adm
       en: { subject: str(form, "en_subject", 200), body: String(form.get("en_body") ?? "").slice(0, 5000) },
     },
   });
+  revalidatePath("/admin/settings", "layout");
   return { success: (await getTranslations("common"))("saved") };
 }
 
@@ -239,6 +245,7 @@ export async function saveSecurityAction(_: AdminState, form: FormData): Promise
     protectCalendars: bool(form, "protectCalendars"),
     challengeMaxAttemptsPerMinute: num(form, "challengeMaxAttemptsPerMinute", 1, 1000, 20),
   });
+  revalidatePath("/admin/settings", "layout");
   return { success: (await getTranslations("common"))("saved") };
 }
 

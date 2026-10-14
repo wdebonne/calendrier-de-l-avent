@@ -22,6 +22,7 @@ import {
   unblockAction,
   type AdminState,
 } from "../../actions";
+import { useFormAction } from "@/components/use-form-action";
 
 function Messages({ state }: { state: AdminState }) {
   if (!state) return null;
@@ -46,9 +47,9 @@ function SaveBar({ pending }: { pending: boolean }) {
 
 export function GeneralForm({ general, sessionDays }: { general: GeneralSettings; sessionDays: number }) {
   const t = useTranslations("admin.general");
-  const [state, action, pending] = useActionState(saveGeneralAction, undefined);
+  const [state, action, pending] = useFormAction(saveGeneralAction, undefined);
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       <Card className="grid gap-4 p-5 sm:grid-cols-2">
         <Field label={t("appName")} className="sm:col-span-2">
           <Input name="appName" defaultValue={general.appName} maxLength={80} />
@@ -77,14 +78,14 @@ export function GeneralForm({ general, sessionDays }: { general: GeneralSettings
 
 export function SmtpForm({ smtp }: { smtp: SmtpSettings & { hasPassword: boolean } }) {
   const t = useTranslations("admin.smtp");
-  const [state, action, pending] = useActionState(saveSmtpAction, undefined);
+  const [state, action, pending] = useFormAction(saveSmtpAction, undefined);
   const [testState, setTestState] = useState<AdminState>(undefined);
   const [testing, startTest] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const [testTo, setTestTo] = useState("");
 
   return (
-    <form ref={formRef} action={action} className="space-y-4">
+    <form ref={formRef} onSubmit={action} className="space-y-4">
       <Card className="space-y-4 p-5">
         <Toggle name="enabled" label={t("enabled")} defaultChecked={smtp.enabled} />
         <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
@@ -149,9 +150,9 @@ export function SmtpForm({ smtp }: { smtp: SmtpSettings & { hasPassword: boolean
 
 export function AuthForm({ auth, smtpEnabled }: { auth: AuthSettings; smtpEnabled: boolean }) {
   const t = useTranslations("admin.auth");
-  const [state, action, pending] = useActionState(saveAuthAction, undefined);
+  const [state, action, pending] = useFormAction(saveAuthAction, undefined);
   return (
-    <form action={action} className="space-y-4">
+    <form onSubmit={action} className="space-y-4">
       {!smtpEnabled && <Alert tone="warning">{t("smtpRequired")}</Alert>}
       <Card className="grid gap-4 p-5 sm:grid-cols-2">
         <Toggle name="forgotPasswordEnabled" label={t("forgotEnabled")} defaultChecked={auth.forgotPasswordEnabled} className="sm:col-span-2" />
@@ -213,14 +214,14 @@ export function SecurityPanel({
   const t = useTranslations("admin.security");
   const tc = useTranslations("common");
   const format = useFormatter();
-  const [state, action, pending] = useActionState(saveSecurityAction, undefined);
+  const [state, action, pending] = useFormAction(saveSecurityAction, undefined);
   const [ruleState, ruleAction, rulePending] = useActionState(addIpRuleAction, undefined);
   const [busy, start] = useTransition();
   const scopeLabel = (s: string) => (s.startsWith("unlock:") ? `🔒 ${t("calendarScope")}` : s);
 
   return (
     <div className="space-y-6">
-      <form action={action} className="space-y-4">
+      <form onSubmit={action} className="space-y-4">
         <Card>
           <CardHeader title={`🛡️ ${t("bruteforce")}`} />
           <div className="space-y-4 p-5">
