@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 
 # ---- Dependencies ---------------------------------------------------------
-FROM node:22-bookworm-slim AS deps
+FROM node:24-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 # ---- Build ----------------------------------------------------------------
-FROM node:22-bookworm-slim AS build
+FROM node:24-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
@@ -16,7 +16,7 @@ COPY . .
 RUN DATA_DIR=/tmp/build-data npm run build
 
 # ---- Runtime --------------------------------------------------------------
-FROM node:22-bookworm-slim AS runtime
+FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \

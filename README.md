@@ -34,10 +34,20 @@ Interface en français et en anglais.
 
 ## Démarrage rapide (Docker)
 
+L'image est construite automatiquement par GitHub Actions et publiée sur `ghcr.io/wdebonne/calendrier-de-l-avent` : le serveur n'a qu'à la télécharger.
+
 ```bash
 cp .env.example .env      # facultatif
-docker compose up -d --build
+docker compose up -d
 ```
+
+Pour construire l'image vous-même depuis les sources :
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+```
+
+> **Antivirus avec inspection HTTPS** (Norton, Kaspersky, Avast…) : un build local échoue avec `UNABLE_TO_VERIFY_LEAF_SIGNATURE`, car les conteneurs ne font pas confiance au certificat de l'antivirus. Utilisez l'image pré-construite (méthode par défaut) ou désactivez l'analyse HTTPS le temps du build.
 
 Ouvrez `http://localhost:3000` : l'assistant crée le compte administrateur au premier lancement (ou définissez `ADMIN_EMAIL` / `ADMIN_PASSWORD`).
 
@@ -49,11 +59,12 @@ Toutes les données (base SQLite, médias, secret) sont dans le volume `advent-d
 2. Dans Portainer : **Stacks → Add stack → Repository**.
    - *Repository URL* : `https://github.com/<vous>/<depot>` (ajoutez un jeton si le dépôt est privé).
    - *Compose path* : `docker-compose.yml` (SQLite) ou `docker-compose.postgres.yml` (avec PostgreSQL).
+     Pour construire sur le serveur plutôt que télécharger l'image, ajoutez `docker-compose.build.yml` dans *Additional paths*.
    - *Environment variables* : au minimum `APP_URL` (l'URL publique, utilisée dans les emails et le QR code) et, si vous utilisez PostgreSQL, `POSTGRES_PASSWORD`.
    - Activez **GitOps updates** (polling ou webhook) pour redéployer à chaque push.
 3. **Deploy the stack.**
 
-> **Image pré-construite (optionnel)** : le workflow `.github/workflows/docker.yml` teste le code puis publie l'image sur `ghcr.io/<vous>/<depot>`. Définissez `IMAGE=ghcr.io/<vous>/<depot>:latest` dans les variables de la stack pour que Portainer télécharge l'image au lieu de la construire.
+> **Image** : à chaque push sur `main`, le workflow `.github/workflows/docker.yml` teste le code puis publie l'image `ghcr.io/wdebonne/calendrier-de-l-avent:latest`. Au premier envoi, le paquet est **privé** : rendez-le public (GitHub → *Packages* → *Package settings* → *Change visibility*) ou ajoutez le registre `ghcr.io` avec un jeton dans Portainer (*Registries*). Pour redéployer une nouvelle version, utilisez *Pull and redeploy* sur la stack. Pour une autre image, définissez la variable `IMAGE`.
 
 **Derrière un reverse proxy HTTPS** (Nginx Proxy Manager, Traefik…) : mettez `COOKIE_SECURE=true` et laissez `TRUST_PROXY=true` pour que l'anti-force brute voie la vraie IP des visiteurs. Si l'application est exposée **sans** proxy, mettez `TRUST_PROXY=false` (sinon un client pourrait falsifier son IP via l'en-tête `X-Forwarded-For`).
 

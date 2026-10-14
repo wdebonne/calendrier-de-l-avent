@@ -1,9 +1,10 @@
 # Stack par défaut : application seule avec SQLite (idéal pour tester).
-# Portainer : Stacks > Add stack > Repository > ce fichier.
+# Utilise l'image construite par GitHub Actions (ghcr.io) : rien n'est compilé sur le serveur.
+# Pour construire depuis les sources, ajoutez docker-compose.build.yml (voir README).
 services:
   app:
-    build: .
-    image: ${IMAGE:-advent-calendar:latest}
+    image: ${IMAGE:-ghcr.io/wdebonne/calendrier-de-l-avent:latest}
+    pull_policy: always
     container_name: advent-calendar
     restart: unless-stopped
     ports:

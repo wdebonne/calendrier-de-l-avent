@@ -1,0 +1,8 @@
+# Surcharge pour construire l'image depuis les sources au lieu de la télécharger :
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+# (ou avec docker-compose.postgres.yml). Dans Portainer : "Additional paths".
+services:
+  app:
+    build: .
+    image: advent-calendar:local
+    pull_policy: build

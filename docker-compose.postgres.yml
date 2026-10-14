@@ -5,8 +5,8 @@
 #  2. Ou décommenter DATABASE_URL pour imposer PostgreSQL dès le démarrage (base vide).
 services:
   app:
-    build: .
-    image: ${IMAGE:-advent-calendar:latest}
+    image: ${IMAGE:-ghcr.io/wdebonne/calendrier-de-l-avent:latest}
+    pull_policy: always
     container_name: advent-calendar
     restart: unless-stopped
     depends_on:
