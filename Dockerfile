@@ -2,6 +2,9 @@
 
 # ---- Dependencies ---------------------------------------------------------
 FROM node:24-bookworm-slim AS deps
+# Toolchain for native modules (better-sqlite3 is built with node-gyp during install).
+# Only used in this stage: the runtime image stays slim.
+RUN apt-get update  && apt-get install -y --no-install-recommends python3 make g++  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund

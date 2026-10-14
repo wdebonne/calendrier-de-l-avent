@@ -1,20 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, Mountains_of_Christmas, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+// Fonts are bundled from npm (no request to Google at build time or runtime).
+import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource-variable/playfair-display";
+import "@fontsource-variable/caveat";
+import "@fontsource/mountains-of-christmas/400.css";
+import "@fontsource/mountains-of-christmas/700.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getClientIp, ipDecision } from "@/lib/security/guard";
 import { getSetting } from "@/lib/settings";
 import "./globals.css";
-
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
-const festive = Mountains_of_Christmas({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-festive",
-  display: "swap",
-});
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap" });
-const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const general = await getSetting("general");
@@ -32,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const t = await getTranslations("common");
 
   return (
-    <html lang={locale} className={`${jakarta.variable} ${festive.variable} ${playfair.variable} ${caveat.variable}`}>
+    <html lang={locale}>
       <body className="min-h-dvh">
         {denied ? (
           <main className="flex min-h-dvh flex-col items-center justify-center p-6 text-center">

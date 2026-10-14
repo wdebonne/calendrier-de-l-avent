@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-festive: var(--font-festive), "Georgia", serif;
-  --font-serif: var(--font-playfair), Georgia, serif;
-  --font-hand: var(--font-caveat), cursive;
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-festive: "Mountains of Christmas", Georgia, serif;
+  --font-serif: "Playfair Display Variable", Georgia, serif;
+  --font-hand: "Caveat Variable", cursive;
 
   --color-brand-50: #fff1f2;
   --color-brand-100: #ffe4e6;
