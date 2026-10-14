@@ -1,0 +1,47 @@
+# Stack de production : application + PostgreSQL.
+# Deux façons de basculer :
+#  1. Démarrer cette stack, puis dans Admin > Paramètres > Base de données,
+#     saisir hôte "postgres" et cliquer "Copier les données et basculer" (garde vos données SQLite).
+#  2. Ou décommenter DATABASE_URL pour imposer PostgreSQL dès le démarrage (base vide).
+services:
+  app:
+    build: .
+    image: ${IMAGE:-advent-calendar:latest}
+    container_name: advent-calendar
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_SECRET: ${APP_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TZ: ${TZ:-Europe/Paris}
+      # DATABASE_URL: postgres://${POSTGRES_USER:-advent}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-advent}
+    volumes:
+      - advent-data:/app/data
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: advent-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-advent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-advent}
+    volumes:
+      - advent-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  advent-data:
+  advent-pg:

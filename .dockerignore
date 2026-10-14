@@ -1,0 +1,14 @@
+node_modules
+.next
+data
+.git
+.github
+.playwright-mcp
+tests
+coverage
+*.md
+!README.md
+.env
+.env.*
+Dockerfile*
+docker-compose*.yml

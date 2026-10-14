@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-festive: var(--font-festive), "Georgia", serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-hand: var(--font-caveat), cursive;
+
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe4e6;
+  --color-brand-200: #fecdd3;
+  --color-brand-300: #fda4af;
+  --color-brand-400: #fb7185;
+  --color-brand-500: #e11d48;
+  --color-brand-600: #c8102e;
+  --color-brand-700: #9f1239;
+  --color-brand-800: #881337;
+  --color-brand-900: #4c0519;
+
+  --color-pine-50: #f0fdf4;
+  --color-pine-100: #dcfce7;
+  --color-pine-500: #16a34a;
+  --color-pine-600: #15803d;
+  --color-pine-700: #166534;
+  --color-pine-900: #052e16;
+
+  --color-gold-300: #fde68a;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+
+  --color-ink: #1c1917;
+  --color-muted: #78716c;
+  --color-line: #e7e5e4;
+  --color-surface: #ffffff;
+  --color-canvas: #faf7f5;
+
+  --shadow-soft: 0 1px 2px rgb(28 25 23 / 0.04), 0 8px 24px -12px rgb(28 25 23 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(28 25 23 / 0.06), 0 18px 40px -16px rgb(28 25 23 / 0.25);
+
+  --animate-shake: shake 0.45s ease-in-out;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px) rotate(-2deg); }
+  40% { transform: translateX(6px) rotate(2deg); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes snowfall {
+  0% { transform: translate3d(0, -10vh, 0); }
+  100% { transform: translate3d(var(--drift, 20px), 110vh, 0); }
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-brand-200);
+}
+
+.festive-bg {
+  background:
+    radial-gradient(circle at 10% 0%, rgb(225 29 72 / 0.08), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgb(22 163 74 / 0.08), transparent 40%),
+    var(--color-canvas);
+}
+
+.snowflake {
+  position: absolute;
+  top: 0;
+  color: white;
+  pointer-events: none;
+  user-select: none;
+  animation: snowfall linear infinite;
+  text-shadow: 0 0 6px rgb(255 255 255 / 0.6);
+}
+
+.perspective {
+  perspective: 900px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowflake { display: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
