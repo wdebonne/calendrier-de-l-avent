@@ -31,6 +31,8 @@ Les réponses ne sont **jamais envoyées au navigateur** : la vérification se f
 - Sécurité : anti-force brute (seuil, période, durée, blocage progressif, verrouillage de compte), appliqué aussi aux mots de passe de calendrier et aux défis ; **liste blanche / liste noire** IP et CIDR (IPv4/IPv6) ; liste des blocages avec déblocage.
 - Base de données : **SQLite pour tester, bascule vers PostgreSQL depuis l'interface** (copie des données incluse).
 
+- **Sauvegarde et restauration complètes** depuis l'interface (voir plus bas).
+
 Interface en français et en anglais.
 
 ## Démarrage rapide (Docker)
@@ -77,6 +79,17 @@ Toutes les données (base SQLite, médias, secret) sont dans le volume `advent-d
 4. **Redémarrer l'application** (le conteneur redémarre tout seul grâce à `restart: unless-stopped`).
 
 Le fichier SQLite est conservé : **Revenir à SQLite** reste possible (les données créées entre-temps sur PostgreSQL ne sont pas reprises). Vous pouvez aussi imposer PostgreSQL avec la variable `DATABASE_URL` ; l'interface passe alors en lecture seule pour ce réglage.
+
+## Sauvegarder et restaurer
+
+**Admin → Paramètres → Sauvegarde** crée un fichier unique contenant la base et tous les médias.
+
+- **Avec mot de passe** (conseillé) : fichier `.avent` chiffré (AES-256-GCM), mot de passe SMTP inclus. **Sans mot de passe** : archive `.tar.gz` standard, lisible par quiconque la possède.
+- Les sauvegardes sont stockées dans `/app/data/backups`, donc dans le même volume : téléchargez-en une copie ailleurs.
+- **Restaurer** : le fichier est entièrement vérifié, les données actuelles sont sauvegardées automatiquement, puis la base est remplacée en une transaction. Tous les utilisateurs sont déconnectés.
+- **Changer de serveur** : installez l'application, créez un compte avec l'assistant, importez le fichier puis restaurez-le. Une sauvegarde SQLite se restaure sur PostgreSQL et inversement.
+- Non inclus : les sessions ouvertes, les liens de réinitialisation, l'historique des échecs et blocages, `APP_SECRET` et la configuration de connexion PostgreSQL (propres à chaque serveur).
+- Pour importer un gros fichier derrière un reverse proxy, augmentez sa taille d'envoi maximale (`client_max_body_size` sous Nginx).
 
 ## Variables d'environnement
 

@@ -1,18 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui";
+import { requireAdmin } from "@/lib/auth/session";
+import { listBackups } from "@/lib/backup/service";
 import { getDb } from "@/lib/db";
 import { currentDbConfig, readSavedPostgres, tableCounts } from "@/lib/db/switch";
 import { getClientIp } from "@/lib/security/guard";
 import { getSetting } from "@/lib/settings";
 import { cn, nowIso } from "@/lib/utils";
+import { BackupPanel } from "./backup-panel";
 import { AuthForm, DatabasePanel, GeneralForm, SecurityPanel, SmtpForm } from "./forms";
 
-const TABS = ["general", "smtp", "auth", "security", "database"] as const;
+const TABS = ["general", "smtp", "auth", "security", "database", "backup"] as const;
 type Tab = (typeof TABS)[number];
 
 export default async function SettingsPage({ params }: { params: Promise<{ tab: string }> }) {
+  await requireAdmin();
   const { tab } = await params;
   if (!(TABS as readonly string[]).includes(tab)) notFound();
   const t = await getTranslations("admin");
@@ -65,6 +69,9 @@ export default async function SettingsPage({ params }: { params: Promise<{ tab: 
       );
       break;
     }
+    case "backup":
+      content = <BackupPanel backups={await listBackups()} locale={await getLocale()} />;
+      break;
   }
 
   return (

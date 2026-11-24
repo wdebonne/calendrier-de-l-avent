@@ -5,22 +5,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { UPLOAD_DIR } from "@/lib/env";
+import { MEDIA_TYPES } from "@/lib/media-types";
 import { getSetting } from "@/lib/settings";
 import { newId, nowIso } from "@/lib/utils";
-
-// SVG is deliberately excluded (it can carry scripts).
-const ALLOWED: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "image/gif": "gif",
-  "image/avif": "avif",
-  "video/mp4": "mp4",
-  "video/webm": "webm",
-  "video/ogg": "ogv",
-  "video/quicktime": "mov",
-  "application/pdf": "pdf",
-};
 
 /** Some phones and file managers send PDFs without a proper type. */
 function detectMime(file: File): string {
@@ -42,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `max ${maxUploadMb} MB`, maxMb: maxUploadMb }, { status: 413 });
   }
   const type = detectMime(file);
-  const ext = ALLOWED[type];
+  const ext = MEDIA_TYPES[type];
   if (!ext) return NextResponse.json({ error: "unsupported type" }, { status: 415 });
 
   const id = newId();

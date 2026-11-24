@@ -6,8 +6,10 @@ import crypto from "node:crypto";
 // Runtime data lives outside the build: the ignore hints stop the bundler from tracing these paths.
 export const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.env.DATA_DIR || path.join(/*turbopackIgnore: true*/ process.cwd(), "data"));
 export const UPLOAD_DIR = path.join(/*turbopackIgnore: true*/ DATA_DIR, "uploads");
+export const BACKUP_DIR = path.join(/*turbopackIgnore: true*/ DATA_DIR, "backups");
 
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+fs.mkdirSync(BACKUP_DIR, { recursive: true, mode: 0o700 });
 
 let cachedSecret: string | null = null;
 
