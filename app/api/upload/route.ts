@@ -19,7 +19,16 @@ const ALLOWED: Record<string, string> = {
   "video/webm": "webm",
   "video/ogg": "ogv",
   "video/quicktime": "mov",
+  "application/pdf": "pdf",
 };
+
+/** Some phones and file managers send PDFs without a proper type. */
+function detectMime(file: File): string {
+  if (["", "application/octet-stream", "application/x-pdf"].includes(file.type) && /\.pdf$/i.test(file.name)) {
+    return "application/pdf";
+  }
+  return file.type;
+}
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -30,14 +39,15 @@ export async function POST(request: Request) {
   const file = form?.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "no file" }, { status: 400 });
   if (file.size > maxUploadMb * 1024 * 1024) {
-    return NextResponse.json({ error: `max ${maxUploadMb} MB` }, { status: 413 });
+    return NextResponse.json({ error: `max ${maxUploadMb} MB`, maxMb: maxUploadMb }, { status: 413 });
   }
-  const ext = ALLOWED[file.type];
+  const type = detectMime(file);
+  const ext = ALLOWED[type];
   if (!ext) return NextResponse.json({ error: "unsupported type" }, { status: 415 });
 
   const id = newId();
   let buffer: Buffer = Buffer.from(await file.arrayBuffer());
-  let mime = file.type;
+  let mime = type;
   let finalExt = ext;
 
   if (["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type)) {
@@ -54,6 +64,11 @@ export async function POST(request: Request) {
     } catch {
       return NextResponse.json({ error: "invalid image" }, { status: 415 });
     }
+  }
+
+  // The declared type is client-controlled: check the actual file signature.
+  if (type === "application/pdf" && !buffer.subarray(0, 1024).includes("%PDF-")) {
+    return NextResponse.json({ error: "invalid pdf" }, { status: 415 });
   }
 
   const filename = `${id}.${finalExt}`;

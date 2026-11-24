@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ExternalLink } from "lucide-react";
 import type { DayContent } from "@/lib/calendar/public";
+import { PdfViewer } from "@/components/pdf/pdf-viewer";
 import { cn } from "@/lib/utils";
 
 export function ContentView({ content, accent, fontClass }: { content: DayContent; accent: string; fontClass?: string }) {
@@ -45,6 +46,8 @@ export function ContentView({ content, accent, fontClass }: { content: DayConten
       {(content.type === "youtube" || content.type === "vimeo") && !content.embedUrl && content.url && (
         <LinkCard url={content.url} accent={accent} label={t("openLink")} />
       )}
+
+      {content.type === "pdf" && content.url && <PdfViewer url={content.url} title={content.label} accent={accent} />}
 
       {content.type === "link" && content.url && <LinkCard url={content.url} accent={accent} label={t("openLink")} />}
 

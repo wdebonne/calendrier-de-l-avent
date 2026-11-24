@@ -1,6 +1,6 @@
 # 🎄 Calendrier de l'Avent
 
-Application web pour créer des calendriers de l'Avent personnalisés : une case par jour (par défaut du 1er au 24 décembre), qui révèle une photo, une vidéo, une vidéo YouTube/Vimeo, un lien ou un message, avec animations, défis, QR code et statistiques.
+Application web pour créer des calendriers de l'Avent personnalisés : une case par jour (par défaut du 1er au 24 décembre), qui révèle une photo, une vidéo, une vidéo YouTube/Vimeo, un PDF, un lien ou un message, avec animations, défis, QR code et statistiques.
 
 ## Fonctionnalités
 
@@ -12,7 +12,8 @@ Application web pour créer des calendriers de l'Avent personnalisés : une case
 - Mot de passe d'accès optionnel, publication / brouillon, duplication.
 - Apparence : 6 thèmes prêts à l'emploi, couleurs, image de fond, police, forme des cases, disposition mélangée, neige.
 - Animations au clic (porte 3D, retournement, cadeau, papier déchiré…) et effets d'ouverture (confettis, flocons, étoiles, feu d'artifice…), réglables par case.
-- Contenu par case : upload de photos/vidéos (glisser-déposer) ou lien externe.
+- Contenu par case : upload de photos, vidéos et PDF (glisser-déposer) ou lien externe.
+- PDF consultables dans le calendrier sur mobile, tablette et PC (PDF.js embarqué) : défilement, zoom, plein écran, téléchargement. Un PDF hébergé sur un autre site s'ouvre dans un nouvel onglet.
 
 **Défis pour ouvrir une case** — modèles prêts à l'emploi, personnalisables et testables dans l'éditeur :
 énigme (tolérante aux majuscules, accents et articles), code/cadenas, QCM, vrai/faux, mot mélangé, memory, taquin.
@@ -100,7 +101,7 @@ npm run lint       # vérification TypeScript
 npm run build
 ```
 
-Stack : Next.js 16 (App Router), React 19, Tailwind CSS 4, Kysely (SQLite via better-sqlite3 / PostgreSQL via pg), next-intl, Framer Motion, Recharts, qr-code-styling, Nodemailer, Argon2.
+Stack : Next.js 16 (App Router), React 19, Tailwind CSS 4, Kysely (SQLite via better-sqlite3 / PostgreSQL via pg), next-intl, Framer Motion, Recharts, qr-code-styling, PDF.js, Nodemailer, Argon2.
 
 ## Notes de sécurité
 

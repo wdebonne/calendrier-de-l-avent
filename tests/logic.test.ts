@@ -3,6 +3,7 @@ import { dateRange, defaultAdventRange, isDayAvailable, todayInTimeZone } from "
 import { parseChallenge, toPublicChallenge, unlockedHints, verifyAnswer, type Challenge } from "@/lib/challenges";
 import { CHALLENGE_TEMPLATES } from "@/lib/challenges/templates";
 import { blockDurationMinutes, evaluateIpRules, ipMatches, isValidCidr } from "@/lib/security/ip";
+import { smtpErrorKey, smtpTls } from "@/lib/smtp";
 import { randomNumericSlug } from "@/lib/utils";
 
 describe("dates", () => {
@@ -113,5 +114,22 @@ describe("slugs", () => {
     const s = randomNumericSlug(10);
     expect(s).toMatch(/^[1-9]\d{9}$/);
     expect(new Set(Array.from({ length: 50 }, () => randomNumericSlug())).size).toBe(50);
+  });
+});
+
+describe("smtp", () => {
+  it("matches the encryption mode to the port without ever downgrading", () => {
+    expect(smtpTls(465, false)).toEqual({ secure: true, requireTLS: false });
+    expect(smtpTls(587, true)).toEqual({ secure: false, requireTLS: true });
+    expect(smtpTls(587, false)).toEqual({ secure: false, requireTLS: false });
+    expect(smtpTls(2465, true)).toEqual({ secure: true, requireTLS: false });
+  });
+
+  it("explains common errors", () => {
+    expect(smtpErrorKey({ code: "ESOCKET", message: "SSL routines:tls_validate_record_header:wrong version number" })).toBe("errTls");
+    expect(smtpErrorKey({ code: "EAUTH", responseCode: 535, message: "Invalid login" })).toBe("errAuth");
+    expect(smtpErrorKey({ code: "EDNS", message: "getaddrinfo ENOTFOUND smtp.nope" })).toBe("errHost");
+    expect(smtpErrorKey({ code: "ESOCKET", message: "connect ECONNREFUSED 127.0.0.1:587" })).toBe("errRefused");
+    expect(smtpErrorKey({ message: "something else" })).toBeNull();
   });
 });

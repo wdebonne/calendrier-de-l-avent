@@ -1,6 +1,7 @@
 import "server-only";
 import nodemailer from "nodemailer";
 import { getSetting, type SmtpSettings } from "@/lib/settings";
+import { smtpTls } from "@/lib/smtp";
 
 export function renderTemplate(template: string, vars: Record<string, string>): string {
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => vars[k] ?? "");
@@ -10,7 +11,7 @@ function transport(smtp: SmtpSettings) {
   return nodemailer.createTransport({
     host: smtp.host,
     port: smtp.port,
-    secure: smtp.secure,
+    ...smtpTls(smtp.port, smtp.secure),
     auth: smtp.user ? { user: smtp.user, pass: smtp.password } : undefined,
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,

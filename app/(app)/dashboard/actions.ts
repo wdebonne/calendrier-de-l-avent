@@ -112,7 +112,7 @@ export async function updateAppearanceAction(
   return { success: (await getTranslations("common"))("saved") };
 }
 
-const CONTENT_TYPES = ["image", "video", "youtube", "vimeo", "link", "text"] as const;
+const CONTENT_TYPES = ["image", "video", "youtube", "vimeo", "link", "pdf", "text"] as const;
 
 function isSafeUrl(url: string) {
   if (url.startsWith("/api/media/")) return true;

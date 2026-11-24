@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { FileText, Film, Image as ImageIcon, Link2, Loader2, Save, SquarePlay, MonitorPlay } from "lucide-react";
+import { FileText, Film, Image as ImageIcon, Link2, Loader2, Save, SquarePlay, MessageSquareText, MonitorPlay } from "lucide-react";
 import { Alert, Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { MediaInput } from "@/components/media-input";
 import { ChallengeEditor, type ChallengeDraft } from "@/components/challenges/challenge-editor";
@@ -29,7 +29,8 @@ const TYPES = [
   { key: "youtube", icon: MonitorPlay },
   { key: "vimeo", icon: SquarePlay },
   { key: "link", icon: Link2 },
-  { key: "text", icon: FileText },
+  { key: "pdf", icon: FileText },
+  { key: "text", icon: MessageSquareText },
 ] as const;
 
 const filled = (d: EditableDay) => !!(d.content_url || d.content_text);
@@ -88,7 +89,7 @@ export function DaysEditor({
 
   const filledCount = days.filter(filled).length;
   const dayNum = (date: string) => Number(date.slice(8, 10));
-  const isUploadType = draft?.content_type === "image" || draft?.content_type === "video";
+  const isUploadType = ["image", "video", "pdf"].includes(draft?.content_type ?? "");
 
   return (
     <div className="grid gap-6 lg:grid-cols-[17rem_1fr]">
@@ -153,7 +154,7 @@ export function DaysEditor({
 
               <div>
                 <div className="mb-2 text-sm font-medium text-stone-700">{t("contentType")}</div>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
                   {TYPES.map(({ key, icon: Icon }) => (
                     <button
                       key={key}
@@ -174,12 +175,12 @@ export function DaysEditor({
               </div>
 
               {draft.content_type !== "text" && (
-                <Field label={t("url")} hint={isUploadType ? t("orUpload") : undefined}>
+                <Field label={t("url")} hint={draft.content_type === "pdf" ? t("pdfHint") : isUploadType ? t("orUpload") : undefined}>
                   {isUploadType ? (
                     <MediaInput
                       key={draft.content_type}
                       value={draft.content_url}
-                      accept={draft.content_type === "video" ? "video/*" : "image/*"}
+                      accept={draft.content_type === "video" ? "video/*" : draft.content_type === "pdf" ? "application/pdf,.pdf" : "image/*"}
                       onChange={(content_url) => update({ content_url })}
                     />
                   ) : (

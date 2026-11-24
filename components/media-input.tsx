@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { FileText, ImagePlus, Loader2, Upload, X } from "lucide-react";
 import { Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,16 @@ export function MediaInput({
   const [error, setError] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
 
+  const isPdfField = accept.includes("pdf");
+
   async function upload(file: File) {
+    // `accept` only filters the file picker: dropped files must be checked too.
+    const family = accept.split("/")[0];
+    const matches = isPdfField ? /pdf/i.test(file.type) || /\.pdf$/i.test(file.name) : file.type.startsWith(`${family}/`);
+    if (!matches) {
+      setError(tc("wrongFileType"));
+      return;
+    }
     setUploading(true);
     setError(null);
     try {
@@ -34,6 +43,8 @@ export function MediaInput({
       body.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body });
       const json = await res.json();
+      if (res.status === 413) throw new Error(tc("fileTooLarge", { max: json.maxMb }));
+      if (res.status === 415) throw new Error(tc("unreadableFile"));
       if (!res.ok) throw new Error(json.error || res.statusText);
       onChange(json.url);
     } catch (e) {
@@ -43,7 +54,7 @@ export function MediaInput({
     }
   }
 
-  const isImage = value && (accept.startsWith("image") || /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(value));
+  const isImage = value && !isPdfField && (accept.startsWith("image") || /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(value));
   const isVideo = value && accept.startsWith("video");
 
   return (
@@ -69,7 +80,7 @@ export function MediaInput({
           disabled={uploading}
           className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-dashed border-stone-300 px-3 text-sm font-medium text-stone-600 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
         >
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : isPdfField ? <Upload className="h-4 w-4" /> : <ImagePlus className="h-4 w-4" />}
           <span className="hidden sm:inline">{uploading ? tc("uploading") : tc("upload")}</span>
         </button>
         <input
@@ -85,6 +96,22 @@ export function MediaInput({
         />
       </div>
       {error && <p className="mt-1.5 text-xs text-brand-700">{error}</p>}
+      {showPreview && value && isPdfField && (
+        <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-line bg-stone-50 py-1.5 pl-3 pr-1.5 text-sm">
+          <FileText className="h-4 w-4 text-brand-600" />
+          <a href={value} target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
+            {tc("viewPdf")}
+          </a>
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="grid h-6 w-6 place-items-center rounded-full text-stone-600 hover:bg-stone-200"
+            aria-label={tc("remove")}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
       {showPreview && value && (isImage || isVideo) && (
         <div className="relative mt-2 inline-block">
           {isVideo ? (

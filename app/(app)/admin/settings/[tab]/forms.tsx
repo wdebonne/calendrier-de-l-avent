@@ -83,6 +83,8 @@ export function SmtpForm({ smtp }: { smtp: SmtpSettings & { hasPassword: boolean
   const [testing, startTest] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const [testTo, setTestTo] = useState("");
+  const [port, setPort] = useState(String(smtp.port));
+  const [secure, setSecure] = useState(smtp.secure);
 
   return (
     <form ref={formRef} onSubmit={action} className="space-y-4">
@@ -93,10 +95,20 @@ export function SmtpForm({ smtp }: { smtp: SmtpSettings & { hasPassword: boolean
             <Input name="host" defaultValue={smtp.host} placeholder="smtp.example.com" />
           </Field>
           <Field label={t("port")}>
-            <Input name="port" type="number" defaultValue={smtp.port} />
+            <Input
+              name="port"
+              type="number"
+              value={port}
+              onChange={(e) => {
+                setPort(e.target.value);
+                // The encryption mode follows from the standard ports.
+                if (e.target.value === "465") setSecure(true);
+                if (e.target.value === "587" || e.target.value === "25") setSecure(false);
+              }}
+            />
           </Field>
         </div>
-        <Toggle name="secure" label={t("secure")} description={t("secureHint")} defaultChecked={smtp.secure} />
+        <Toggle name="secure" label={t("secure")} description={t("secureHint")} checked={secure} onChange={(e) => setSecure(e.target.checked)} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("user")}>
             <Input name="user" defaultValue={smtp.user} autoComplete="off" />
@@ -131,12 +143,11 @@ export function SmtpForm({ smtp }: { smtp: SmtpSettings & { hasPassword: boolean
               type="button"
               variant="secondary"
               disabled={testing || !testTo}
-              onClick={() =>
-                startTest(async () => {
-                  setTestState(undefined);
-                  setTestState(await testSmtpAction(new FormData(formRef.current!)));
-                })
-              }
+              onClick={() => {
+                // Outside the transition, so the previous result disappears right away.
+                setTestState(undefined);
+                startTest(async () => setTestState(await testSmtpAction(new FormData(formRef.current!))));
+              }}
             >
               {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {t("testSend")}
             </Button>
@@ -385,11 +396,10 @@ export function DatabasePanel({
   const [restarting, setRestarting] = useState(false);
   const locked = source === "env";
 
-  const run = (fn: (f: FormData) => Promise<AdminState>) =>
-    start(async () => {
-      setState(undefined);
-      setState(await fn(new FormData(formRef.current!)));
-    });
+  const run = (fn: (f: FormData) => Promise<AdminState>) => {
+    setState(undefined);
+    start(async () => setState(await fn(new FormData(formRef.current!))));
+  };
 
   function restart() {
     setRestarting(true);

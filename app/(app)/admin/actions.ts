@@ -14,6 +14,7 @@ import { sendMail, verifySmtp } from "@/lib/mailer";
 import { getClientIp, invalidateIpRules } from "@/lib/security/guard";
 import { evaluateIpRules, isValidCidr } from "@/lib/security/ip";
 import { getSetting, setSetting, type SmtpSettings } from "@/lib/settings";
+import { smtpErrorKey } from "@/lib/smtp";
 import { newId, nowIso } from "@/lib/utils";
 
 export type AdminState = { error?: string; success?: string; link?: string } | undefined;
@@ -213,7 +214,10 @@ export async function testSmtpAction(form: FormData): Promise<AdminState> {
     await sendMail(to, t("testSubject"), t("testBody", { app: general.appName }), { ...smtp, enabled: true });
     return { success: t("testOk") };
   } catch (e) {
-    return { error: t("testFail", { error: (e as Error).message }) };
+    const error = e as Error & { code?: string; responseCode?: number };
+    const key = smtpErrorKey(error);
+    const detail = t("testFail", { error: error.message });
+    return { error: key ? `${t(key)} — ${detail}` : detail };
   }
 }
 

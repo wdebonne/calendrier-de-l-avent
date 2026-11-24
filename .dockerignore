@@ -6,6 +6,7 @@ data
 .playwright-mcp
 tests
 coverage
+public/pdfjs
 *.md
 !README.md
 .env

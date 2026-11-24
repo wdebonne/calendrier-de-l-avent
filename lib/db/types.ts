@@ -60,7 +60,7 @@ export interface DaysTable {
   position: number;
   label: string | null;
   cover_url: string | null;
-  content_type: "image" | "video" | "youtube" | "vimeo" | "link" | "text";
+  content_type: "image" | "video" | "youtube" | "vimeo" | "link" | "pdf" | "text";
   content_url: string | null;
   content_text: string | null;
   open_animation: string | null;

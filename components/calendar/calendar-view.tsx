@@ -346,7 +346,13 @@ export function CalendarView({
         )}
       </Modal>
 
-      <Modal open={!!content} onClose={closeContent} variant={content?.animation} label={content?.label ?? "content"}>
+      <Modal
+        open={!!content}
+        onClose={closeContent}
+        variant={content?.animation}
+        label={content?.label ?? "content"}
+        className={content?.type === "pdf" ? "p-4 sm:max-w-4xl sm:p-6" : undefined}
+      >
         {content && <ContentView content={content} accent={pickReadableAccent(theme)} fontClass={fontClass} />}
       </Modal>
     </div>
